@@ -7,7 +7,9 @@ const { MongoClient, GridFSBucket } = require('mongodb');
 const multer = require('multer');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv').config();
+const dotenv = require('dotenv')
+dotenv.config();
+const cookieParser = require('cookie-parser')
 
 const app = express();
 
@@ -36,6 +38,7 @@ mongoose.connection.on('connected', async () => {
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser())
 
 // DB schema
 const File = new mongoose.Schema({
@@ -68,12 +71,41 @@ const userSchema = new mongoose.Schema({
     file: File,
 });
 
-const User = mongoose.model("User", userSchema);
-
-app.get('/', (req, res) => {
-    res.status(200).send("Welcome To SAvirtualization🎴");
+const RefreshToken = new mongoose.Schema({
+    token: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+    expiresAt: { type: Date, required: true }
 });
 
+const User = mongoose.model("User", userSchema);
+
+const RefreshTokenModel = mongoose.model("RefreshToken", RefreshToken);
+
+const authenticateToken = (req, res, next) => {
+    const token = req.cookies.access_token;
+
+    if (!token) {
+        return res.status(401).send("Access Token required");
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).send("Invalid Access Token");
+        }
+
+        req.user = user;
+        next();
+    });
+};
+
+// Endpoints
+app.get('/', (req, res) => {
+    res.status(200).send(`<style>*{
+        text-align: center;</style>
+        <h3> Welcome To SAvirtualization🎴</h3>
+        <marquee style="background-color: ghostwhite;"><h2>Change what you can, the world is already changing, don't stay behind.</h2></marquee>
+       `);
+});
 app.post('/register', async (req, res) => {
     try {
         const existingPerson = await User.findOne({ idNumber: req.body.idNumber });
@@ -85,6 +117,7 @@ app.post('/register', async (req, res) => {
         const hashPassword = await bcrypt.hash(req.body.password, salt);
 
         const payload = { ...req.body, password: hashPassword };
+        delete payload.confirmPassword
         const newPerson = new User(payload);
         const result = await newPerson.save();
 
@@ -107,7 +140,6 @@ app.post('/register', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
-
 app.post('/login', async (req, res) => {
     try {
         const existingPerson = await User.findOne({ idNumber: req.body.idNumber });
@@ -120,11 +152,25 @@ app.post('/login', async (req, res) => {
             return res.status(401).send('Password is Incorrect');
         }
 
-        const token = jwt.sign({
+        const accessToken = jwt.sign({
             id: existingPerson._id,
         }, process.env.JWT_SECRET, { expiresIn: "10m" });
 
-        res.cookie("access_token", token, { httpOnly: true, secure: true, sameSite: "Strict" });
+        const refreshToken = jwt.sign({
+            id: existingPerson._id,
+        }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
+
+        const newRefreshToken = new RefreshTokenModel({
+            token: refreshToken,
+            userId: existingPerson._id,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+        });
+
+        await newRefreshToken.save();
+
+        res.cookie("access_token", accessToken, { httpOnly: true, secure: true, sameSite: "Strict" });
+        res.cookie("refresh_token", refreshToken, { httpOnly: true, secure: true, sameSite: "Strict" });
+
         res.status(200).json({
             status: 200,
             message: "Login Success",
@@ -137,7 +183,36 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.post('/upload/:idNumber', upload.single('file'), async (req, res) => {
+app.post('/token', async (req, res) => {
+    const refreshToken = req.cookies.refresh_token;
+
+    if (!refreshToken) {
+        return res.status(401).send("Refresh Token not provided");
+    }
+
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        const existingToken = await RefreshTokenModel.findOne({ token: refreshToken, userId: decoded.id });
+
+        if (!existingToken) {
+            return res.status(401).send("Invalid Refresh Token");
+        }
+
+        const newAccessToken = jwt.sign({
+            id: decoded.id,
+        }, process.env.JWT_SECRET, { expiresIn: "10m" });
+
+        res.cookie("access_token", newAccessToken, { httpOnly: true, secure: true, sameSite: "Strict" });
+
+        res.status(200).json({ accessToken: newAccessToken });
+    } catch (error) {
+        console.error(error);
+        res.status(401).send("Invalid Refresh Token");
+    }
+});
+
+// FIle upload
+app.post('/upload/:idNumber', authenticateToken, upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).send("No file uploaded");
@@ -183,8 +258,8 @@ app.post('/upload/:idNumber', upload.single('file'), async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
-
-app.get('/get-file/:id', (req, res) => {
+// Get File
+app.get('/get-file/:id', authenticateToken, (req, res) => {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -206,6 +281,7 @@ app.get('/get-file/:id', (req, res) => {
 
     downloadStream.pipe(res);
 });
+
 
 const PORT = process.env.SERVER_PORT || 2522;
 app.listen(PORT, () => {
