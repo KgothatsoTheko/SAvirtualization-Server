@@ -5,6 +5,7 @@ const sendMail = require('./sendMail.js');
 const { Readable } = require('stream');
 const { MongoClient, GridFSBucket } = require('mongodb');
 const multer = require('multer');
+const bwipjs = require('bwip-js')
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv')
@@ -48,7 +49,6 @@ const File = new mongoose.Schema({
     fileId: { type: String, required: true },
     length: { type: Number, required: true }
 });
-
 const License = new mongoose.Schema({
     licenseNumber: { type: String },
     valid: { type: String },
@@ -57,7 +57,6 @@ const License = new mongoose.Schema({
     vehicleRestriction: { type: Number },
     firstIssued: { type: String },
 });
-
 const userSchema = new mongoose.Schema({
     fullForeName: { type: String },
     lastName: { type: String },
@@ -70,17 +69,14 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: false },
     file: File,
 });
-
+//-- Tokens
 const RefreshToken = new mongoose.Schema({
     token: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
     expiresAt: { type: Date, required: true }
 });
-
 const User = mongoose.model("User", userSchema);
-
 const RefreshTokenModel = mongoose.model("RefreshToken", RefreshToken);
-
 const authenticateToken = (req, res, next) => {
     const token = req.cookies.access_token;
 
@@ -154,11 +150,11 @@ app.post('/login', async (req, res) => {
 
         const accessToken = jwt.sign({
             id: existingPerson._id,
-        }, process.env.JWT_SECRET, { expiresIn: "10m" });
+        }, process.env.JWT_SECRET, { expiresIn: "5m" });
 
         const refreshToken = jwt.sign({
             id: existingPerson._id,
-        }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
+        }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7m" });
 
         const newRefreshToken = new RefreshTokenModel({
             token: refreshToken,
@@ -182,7 +178,24 @@ app.post('/login', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+// Update the User information
+app.post('/update-user/:idNumber', async(req, res) => {
+    try {
+        const filter = { idNumber: req.params.idNumber };
+        const update = req.body;
+        const options = { new: true }; // Return the updated document
 
+        const updatedPerson = await User.findOneAndUpdate(filter, update, options);
+
+        if (!updatedPerson) {
+            return res.status(404).send("User not found");
+        }
+        res.status(200).send(updatedPerson)
+    } catch (error) {
+        res.status(500).send(error)
+    }
+})
+// Get access token
 app.post('/token', async (req, res) => {
     const refreshToken = req.cookies.refresh_token;
 
@@ -210,8 +223,7 @@ app.post('/token', async (req, res) => {
         res.status(401).send("Invalid Refresh Token");
     }
 });
-
-// FIle upload
+// Use access token to now be able to be able upload a file
 app.post('/upload/:idNumber', authenticateToken, upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
@@ -258,7 +270,7 @@ app.post('/upload/:idNumber', authenticateToken, upload.single('file'), async (r
         res.status(500).send("Internal Server Error");
     }
 });
-// Get File
+// Use access token to now be able to be able to Get File
 app.get('/get-file/:id', authenticateToken, (req, res) => {
     const { id } = req.params;
 
@@ -281,6 +293,63 @@ app.get('/get-file/:id', authenticateToken, (req, res) => {
 
     downloadStream.pipe(res);
 });
+// Generate PDF417 barcode
+app.get('/generate-barcode/:idNumber', (req, res)=> {
+
+    const existingPerson = User.findOne({ idNumber: req.params.idNumber });
+        if (!existingPerson) {
+            return res.status(404).send("User is not found");
+        }
+
+    const data = `This is your data: Hi, ${existingPerson.fullForeName}`;
+
+    bwipjs.toBuffer({
+        bcid: 'pdf417',       // Barcode type
+        text: data,           // Text to encode
+        scale: 3,             // 3x scaling factor
+        height: 10,           // Bar height, in millimeters
+        includetext: true,    // Show human-readable text
+        textxalign: 'center', // Always good to set this
+    }, (err, png) => {
+        if (err) {
+            // Handle error
+            res.status(500).send(err.message);
+        } else {
+            // `png` is a Buffer
+            res.set('Content-Type', 'image/png');
+            res.send(png);
+        }
+    });
+})
+// Generate CODE_39 barcode
+app.get('/generate-barcode2', (req, res)=> {
+
+    const { text } = req.body;
+
+    if (!text) {
+        return res.status(400).json({ error: 'Text is required' });
+    }
+
+    bwipjs.toBuffer({
+        bcid: 'code39',       // Barcode type
+        text: text,           // Text to encode
+        scale: 3,             // 3x scaling factor
+        height: 10,           // Bar height, in millimeters
+        includetext: false,    // Show human-readable text
+        textxalign: 'center', // Always good to set this
+    }, (err, png) => {
+        if (err) {
+            // Handle error
+            res.status(500).send(err.message);
+        } else {
+            // `png` is a Buffer
+            res.set('Content-Type', 'image/png');
+            res.send(png);
+        }
+    });
+})
+
+
 
 
 const PORT = process.env.SERVER_PORT || 2522;
