@@ -57,6 +57,11 @@ const License = new mongoose.Schema({
     vehicleRestriction: { type: Number },
     firstIssued: { type: String },
 });
+const image= new mongoose.Schema({
+    imageData: {
+      type: String
+    }
+  });
 const userSchema = new mongoose.Schema({
     fullForeName: { type: String },
     lastName: { type: String },
@@ -68,6 +73,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: false, unique: true },
     password: { type: String, required: false },
     file: File,
+    signature: image
 });
 //-- Tokens
 const RefreshToken = new mongoose.Schema({
@@ -195,6 +201,52 @@ app.post('/update-user/:idNumber', async(req, res) => {
         res.status(500).send(error)
     }
 })
+// adding signature image
+app.post('/upload-image/:idNumber', async (req, res) => {
+    try {
+        const { imageData } = req.body;
+        
+        if (!imageData) {
+            return res.status(400).json({ error: 'Image data is required' });
+        }
+
+        // Find the user by idNumber
+        const existingPerson = await User.findOne({ idNumber: req.params.idNumber });
+        if (!existingPerson) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Update the user's signature with the new image data
+        existingPerson.signature = { imageData };
+        await existingPerson.save();
+
+        res.status(200).json({ message: 'Image saved successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to save image' });
+    }
+});
+// getting signature image
+app.get('/get-image/:idNumber', async (req, res) => {
+    try {
+        // Find the user by idNumber
+        const existingPerson = await User.findOne({ idNumber: req.params.idNumber });
+        if (!existingPerson) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Check if the user has a signature (image data)
+        if (!existingPerson.signature || !existingPerson.signature.imageData) {
+            return res.status(404).json({ error: 'Image not found' });
+        }
+
+        // Return the image data
+        res.status(200).json({ imageData: existingPerson.signature.imageData });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to retrieve image' });
+    }
+});
 // Get access token
 app.post('/token', async (req, res) => {
     const refreshToken = req.cookies.refresh_token;
@@ -224,7 +276,7 @@ app.post('/token', async (req, res) => {
     }
 });
 // Use access token to now be able to be able upload a file
-app.post('/upload/:idNumber', authenticateToken, upload.single('file'), async (req, res) => {
+app.post('/upload/:idNumber', upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).send("No file uploaded");
