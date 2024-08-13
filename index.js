@@ -37,7 +37,8 @@ mongoose.connection.on('connected', async () => {
     }
 });
 
-app.use(cors());
+app.use(cors({origin: 'http://localhost:4200', // Replace with your Angular app's URL
+    credentials: true}));
 app.use(express.json());
 app.use(cookieParser())
 
@@ -92,6 +93,9 @@ const authenticateToken = (req, res, next) => {
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) {
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).send("Access Token expired");
+            }
             return res.status(403).send("Invalid Access Token");
         }
 
@@ -166,6 +170,7 @@ app.post('/login', async (req, res) => {
             token: refreshToken,
             userId: existingPerson._id,
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+            // expiresAt: new Date(Date.now() + 7 * 60 * 1000) // 7 minutes
         });
 
         await newRefreshToken.save();
@@ -400,9 +405,6 @@ app.get('/generate-barcode2', (req, res)=> {
         }
     });
 })
-
-
-
 
 const PORT = process.env.SERVER_PORT || 2522;
 app.listen(PORT, () => {
