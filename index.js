@@ -84,6 +84,8 @@ const RefreshToken = new mongoose.Schema({
 });
 const User = mongoose.model("User", userSchema);
 const RefreshTokenModel = mongoose.model("RefreshToken", RefreshToken);
+
+// authentication of token middleware
 const authenticateToken = (req, res, next) => {
     const token = req.cookies.access_token;
 
@@ -379,7 +381,7 @@ app.get('/generate-barcode/:idNumber', (req, res)=> {
     });
 })
 // Generate CODE_39 barcode
-app.get('/generate-barcode2', (req, res)=> {
+app.post('/generate-barcode2', (req, res)=> {
 
     const { text } = req.body;
 
