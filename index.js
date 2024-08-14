@@ -9,6 +9,7 @@ const bwipjs = require('bwip-js')
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv')
+const path = require("path")
 dotenv.config();
 const cookieParser = require('cookie-parser')
 
@@ -406,6 +407,12 @@ app.post('/generate-barcode2', (req, res)=> {
             res.send(png);
         }
     });
+})
+
+// Production script
+app.use(express.static("./client/build"))
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"))
 })
 
 const PORT = process.env.SERVER_PORT || 2522;

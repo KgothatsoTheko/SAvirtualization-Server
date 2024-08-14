@@ -1,0 +1,137 @@
+<mat-card class="container full-height2">
+    <div class="full-width full-height padding-10px border-box">
+        <div class="flex space-between-center">
+            <div><img src="../../../assets/Images/Logo.PNG" alt="logo" class="logo"></div>
+            <div class="space-between-center">
+            <div class="flex row gap-1em">
+                <h3 class="pointer" (click)="goToAbout()">About</h3>
+                <h3 class="pointer" (click)="goToContact()">Contact</h3>
+                <h3 class="pointer" (click)="goToServices()">Services</h3>
+            </div>
+            </div>
+        </div>
+        <div class="flex gap-1em">
+            <div class="text-center2 full-width">
+                <h1><u>Welcome To SAvirtualization</u></h1>
+                <p>Official South African virtual ID and Drivers License Providers</p>
+                <div class="flex gap-1em full-width center-center">
+                    <button mat-fab extended class="green-bg white" (click)="goToRegistration()">
+                        Register
+                      </button>
+                      <button mat-fab extended class="gold-bg" (click)="goToLogin()">
+                        Login
+                      </button>
+                </div>
+            </div>
+            <!-- <div class="flex full-width column center-center">
+                <img src="../../../assets/Images/driversjpg.jpg" alt="drivers" class="example"><br>
+                <img src="../../../assets/Images/Id.jpg" alt="ID" class="example">
+            </div> -->
+        </div><br>
+        <mat-card class="padding-10px border-box">
+            <div>
+                <h3 class="no-margin text-center2"><u>What is SAvirtualization?</u></h3>
+                <p class="no-margin text-center2">SAvirtualization is the software that provides citzen of  South Africa their official virtual Identity Smart Card (ID) and Drivering license card that will take the same precedence as the physical ones.</p>
+            </div>
+        </mat-card><br>
+        <mat-card class="flex row gap-1em padding-10px border-box gold-bg">
+            <div class="text-center flex column gap-05em">
+                <span class="material-symbols-outlined">
+                    lightbulb
+                </span>
+                <h4 class="no-margin">Innovation</h4>
+                <p class="no-margin text-center2 flex">Virtual ID and license cards will change how we operate using them and function</p>
+            </div>
+            <div class="text-center flex column gap-05em">
+                <span class="material-symbols-outlined">
+                    lock_person
+                </span>
+                <h4 class="no-margin">Secure</h4>
+                <p class="no-margin text-center2 flex">With this registration and login, your data will be authorized and secure
+                    by offiical South African DHA and Transport</p>
+            </div>
+            <div class="text-center flex column gap-05em">
+                <span class="material-symbols-outlined">
+                    mood
+                </span>
+                <h4 class="no-margin">Convenient</h4>
+                <p class="no-margin text-center2 flex">Gone are days where issues such as fraud and lost ID and license.</p>
+            </div>
+        </mat-card><br>
+        <div class="center-center flex" id="about-us">
+            <div>
+                <div class="flex column relative left-2p index-1">
+                    <img src="../../../assets/Images/Logo.PNG" alt="logo" class="example border-radius-top-left-10px">
+                    <img src="../../../assets/Images/us.jfif" alt="us" class="example border-radius-bottom-left-10px">
+                </div>
+            </div>
+            <mat-card class="content1">
+                <h3 class="no-margin text-center2"><u>About Us</u></h3>
+                <p class="no-margin text-center2">KTK Digital guard is software security company that aims at making things securely easy. We provide digital protection with citizens and companys data and information with providing a online service and product e.g “SAvirtualization”. We aim at making innovative projects that will be secured and make business and lifestyle operations convenient.</p>
+            </mat-card>     
+        </div><br>
+        <h3><u>Our Partners</u></h3>
+        <div class="flex">
+            <mat-card class="padding-10px">
+                <p>As we are an independent company, we are in partnership with South African Government Department of Home Affairs (DHA) & Transport to make SAvirtulization possible. </p>
+                <div class="row">
+                <img src="../../../assets/Images/DHApng.png" alt="DHA" class="partners">
+                <img src="../../../assets/Images/department-of-transport.png" alt="Transport" class="partners">
+                </div>
+            </mat-card>
+        </div><br>
+       <div class="flex center-center" id="services">
+        <div class="flex center-center gold-bg border-radius-10px half-width">
+            <strong>Services</strong>
+        </div>
+       </div><br>
+       <div class="center-center row flex full-width">
+        <mat-card class="text-center2 gold-bg padding-10px services"><h4 class=" no-margin"><strong>Software Solutions</strong></h4></mat-card>
+        <mat-card class="text-center2 padding-10px services"><h4 class=" no-margin"><strong>Data and Cyber Security Management</strong></h4></mat-card>
+        <mat-card class="text-center2 gold-bg padding-10px services"><h4 class=" no-margin"><strong>Cloud Solutions</strong></h4></mat-card>
+        </div><br>
+        <mat-card class="flex row gold-bg padding-10px gap-4em content-center contact" id="contact">
+            <mat-card class="flex content-center full-width">
+                <h4 class="no-margin text-center2">KTK Digital Guard</h4>
+                <mat-divider></mat-divider>
+                <div class="flex row gap-1em">
+                    <span class="material-symbols-outlined">
+                        location_on
+                    </span>
+                    <p class="no-margin">12 ben address,PTA</p>
+                </div>
+                <div class="flex row gap-1em">
+                    <span class="material-symbols-outlined">
+                        email
+                    </span>
+                    <p class="no-margin">support@ktkdg.com</p>
+                </div>
+                <div class="flex row gap-1em">
+                    <span class="material-symbols-outlined">
+                        phone
+                    </span>
+                    <p class="no-margin">(011) 424 4455</p>
+                </div>
+            </mat-card>
+            <div class="flex gap-4em text-center2">
+                <div>
+                    <h3 class="no-margin"><u>Other Pages</u></h3>
+                    <a href="#" class="no-margin">Home</a><br>
+                    <a href = "#" class="no-margin">Services</a><br>
+                    <a href="#" class="no-margin">contact</a><br>
+                </div>
+                <div>
+                    <h3 class="no-margin"><u>Quick Links</u></h3>
+                    <a  href = "#" class="no-margin">Terms Of Services</a><br>
+                    <a  href = "#" class="no-margin">Privacy Policy</a>
+                </div>
+            </div>
+        </mat-card><br>
+        <mat-divider></mat-divider><br>
+        <div class="flex center-center">
+            <footer class="text-center2">Copyright: {{currentYear}} ©️. Developed by KTK Digital Guard ®️ - All Rights Reserved ™️.</footer>
+        </div>
+
+
+    </div>
+</mat-card>

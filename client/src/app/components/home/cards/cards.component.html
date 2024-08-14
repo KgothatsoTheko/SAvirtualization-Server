@@ -1,0 +1,213 @@
+<h3 class="center-center flex">Virtual Cards</h3>
+<mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <h3><strong>Virtual Identity Card</strong></h3>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="scene scene--card">
+        <input id="card" type="checkbox">
+        <label for="card">
+          <div class="card">
+            <div class="card__face card__face--front">
+                <div class="content-center flex gap-2em full-height">
+                    <div class="column flex space-between-center">
+                        <div>
+                            <img src="../../../../assets/Images/south-africa_555604.png" width = "50px" height="50px" alt="SA logo">
+                        </div>
+                        <div class="flex column gap-1em">
+                            <div>
+                                <h1>⠊⠙</h1>
+                            </div>
+                            <div>
+                                <img src="../../../../assets/Images/ID-text.png" width = "50px" alt="ID-text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column flex gap-05em">
+                        <h4 class="no-margin">REPUBLIC OF SOUTH AFRICA</h4>
+                        <p class="no-margin">NATIONAL IDENTITY CARD</p>
+                        <div class="row flex gap-3em line-normal">
+                            <div class="column flex">
+                                <p class="no-margin id-green"><small>Surname:</small></p>
+                                <p class="no-margin">{{this.currentUser.lastName}}</p>
+                                <p class="no-margin id-green"><small>Names:</small></p>
+                                <p class="no-margin">{{this.currentUser.fullForeName}}</p>
+                                <p class="no-margin id-green"><small>Sex:</small></p>
+                                <p class="no-margin">{{this.currentUser.gender}}</p>
+                                <p class="no-margin id-green"><small>Nationality:</small></p>
+                                <p class="no-margin">{{this.currentUser.citizenship}}</p>
+                                <p class="no-margin id-green"><small>Identity Number:</small></p>
+                                <p class="no-margin">{{this.currentUser.idNumber}}</p>
+                                <p class="no-margin id-green"><small>Date of Birth:</small></p>
+                                <p class="no-margin">{{this.currentUser.dateOfBirth}}</p>
+                                <p class="no-margin id-green"><small>Country of Birth:</small></p>
+                                <p class="no-margin">{{this.currentUser.citizenship}}</p>
+                                <p class="no-margin id-green"><small>Status:</small></p>
+                                <p class="no-margin">CITIZEN</p>
+                                
+                            </div>
+                            <div class="column flex content-center gap-1em">
+                                <img [src]="this.profile" alt="profile-image" width="50px" height="50px">
+                                <p class="no-margin id-green"><small>Signature:</small></p>
+                                <img class="no-margin" [src]="this.currentUser.signature.imageData" width="100px" height="100px" alt="noSig">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card__face card__face--back back">
+                <div class="content-center flex gap-4em">
+                    <div class="column flex">
+                        <p class="no-margin id-green text-center2"><small>Conditions:</small></p>
+                        <p class="no-margin"><small>This card has been issued by the Department of Home Affairs in terms of the Identification Act, Act 68 of 1997</small></p>
+                        <span><small>For enquiry or verification purposes contact 0800 60 1190</small></span>
+                    </div>
+                    <div class="column flex text-center2">
+                        <p class="no-margin id-green"><small>Date of Issue:</small></p>
+                        <p class="no-margin"><small>{{date}}</small></p>
+                        <p class="no-margin"></p>
+                    </div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="content-center flex gap-2em">
+                    <div class="text-center flex">
+                        <img [src]="this.profile" width="25px" height="25px" alt="secondImage">
+                    </div>
+                    <div class="column flex">
+                        <div class="text-center2">cardNumber</div>
+                        <div class="text-center2">
+                            <img *ngIf="barcode2" [src]="barcode2" alt="Barcode 2" width="100%" height="50px"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex content-center">
+                    <h3 class="no-margin">
+                        <img *ngIf="barcode1" [src]="barcode1" alt="Barcode" width="100%" height="70px"/>
+                    </h3>
+                </div>
+                
+            </div>
+          </div>
+        </label>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel (opened)="panelOpenState = true"
+                         (closed)="panelOpenState = false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <h3><strong>Virtual Driver's License Card</strong></h3>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="scene2 scene2--card2">
+        <input id="card2" type="checkbox">
+        <label for="card2">
+          <div class="card2">
+            <div class="card__face2 card__face--front2">
+                <div class="gap-3em flex conlie border-box text-center stripes relative">
+                    <p class="no-margin">DRIVING LICENSE</p>
+                    <span class="flex-1"></span>
+                    <div>
+                        <img src="../../../../assets/Images/sadc2.png" width="50px" height="40px" alt="" class="absolute sadc">
+                    </div>
+                    <p class="no-margin"><small>SOUTH AFRICA</small></p>
+                </div>
+                <div class="center-center gap-4em flex border-box padding-5px">
+                    <div class="column line-height-19px">
+                        <p class="no-margin"><small>CARTA DE CONDUCAO</small></p>
+                        <h4 class="no-margin">{{this.currentUser.fullForeName.slice(0,1).toUpperCase()}} {{this.currentUser.lastName.toUpperCase()}}</h4>
+                        <div class="row gap-2em flex">
+                            <p class="no-margin"><small>ID No:</small></p>
+                            <p class="no-margin"><small>{{this.currentUser.idNumber.slice(0,2)}}/{{this.currentUser.idNumber}}</small></p>
+                            <p class="no-margin"><small>{{this.currentUser.gender}}</small></p>
+                        </div>
+                        <div class="row flex">
+                            <p class="no-margin"><small>Birth:</small></p>
+                            <span class="flex-1"></span>
+                            <small class="no-margin">{{this.currentUser.dateOfBirth}} ZA</small>
+                            <div class="gap-1em flex"><br>
+                                <small class="no-margin">Restriction:</small>
+                                <small class="no-margin">0</small>
+                            </div>
+                        </div>
+                        <div class="row flex gap-1em">
+                            <p class="no-margin"><small>Licence Number:</small></p>
+                            <small class="no-margin">{{this.currentUser.license.licenseNumber}}</small>
+                            <div class="gap-1em flex"><br>
+                                <small class="no-margin">No: 1</small>
+                            </div>
+                        </div>
+                        <div class="row flex">
+                            <p class="no-margin"><small>Valid:</small></p>
+                            <span class="flex-1"></span>
+                            <p class="no-margin"><small>{{this.currentUser.license.valid}}</small></p>
+                        </div>
+                        <div class="row flex gap-5em">
+                            <p class="no-margin"><small>Issued:</small></p>
+                            <p class="no-margin"><small>{{this.currentUser.license.issued}}</small></p>
+                        </div>
+                        <div class="row flex">
+                            <p class="no-margin"><small>code:</small></p>
+                            <span class="flex-1"></span>
+                            <p class="no-margin">{{this.currentUser.license.code}}</p>
+                        </div>
+                        <div class="row flex">
+                            <p class="no-margin"><small>Vehiclerestriction:</small></p>
+                            <span class="flex-1"></span>
+                            <p class="no-margin">{{this.currentUser.license.vehicleRestriction}}</p>
+                        </div>
+                        <div class="row flex">
+                            <p class="no-margin"><small>First issue:</small></p>
+                            <span class="flex-1"></span>
+                            <p class="no-margin"><small>{{this.currentUser.license.firstIssued}}</small></p>
+                        </div>
+                        <div class="text-center2">
+                            <p class="no-margin"><small><img class="no-margin" [src]="this.currentUser.signature.imageData" width="100px" height="50px" alt="noSig"></small></p>
+                        </div>
+                    </div>
+                    <div class="column flex text-center2">
+                        <img [src]="this.profile" alt="profile-image2" width="35px" height="45px">
+                    </div>
+                </div>
+            </div>
+            <div class="card__face2 card__face--back2 gap-05em flex column">
+                <div class="row flex center-center white-bg border-top-radius-15px">
+                    <img *ngIf="barcode1" [src]="barcode1" alt="Barcode" width="100%" height="70px"/>
+                </div>
+                <div class="space-between flex border-box padding-left-right-5px car-info">
+                    <div class="column flex">
+                        <small class="no-margin">DRIVER RESTRICTIONS</small>
+                        <small class="no-margin">0 None</small>
+                        <small class="no-margin">1 Glasses / Contact lenses</small>
+                        <small class="no-margin">2 Artifical limb</small>
+                    </div>
+                    <div class="column flex">
+                        <small class="no-margin">PrDP CATEGORIES</small>
+                        <small class="no-margin">P Passengers</small>
+                        <small class="no-margin">G Goods</small>
+                        <small class="no-margin">D Dangerous goods</small>
+                    </div>
+                    <div class="column flex">
+                        <small class="no-margin">VEHICLE RESTRICTIONS</small>
+                        <small class="no-margin">0 None</small>
+                        <small class="no-margin">1 Automatic transmission</small>
+                        <small class="no-margin">2 Electrically powered</small>
+                        <small class="no-margin">3 Physically disabled</small>
+                        <small class="no-margin">4 Bus > 16000 kg (GVM) permitted</small>
+                    </div>
+                </div>
+                <div class="center-center flex gap-2em border-box padding-left-right-5px">
+                    <div>
+                        <img src="../../../../assets/Images/code-types.PNG" alt="code-types" width="180px" height="120px">
+                    </div>
+                    <div class="fingerprint text-center2">
+                        <h3>fingerprint</h3>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </label>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
