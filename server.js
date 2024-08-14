@@ -1,5 +1,5 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sendMail = require('./sendMail.js');
 const { Readable } = require('stream');
@@ -19,7 +19,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // MongoDB connection and GridFSBucket initialization
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URL)
     .then(() => console.log("Connected to MongoDB..."))
     .catch(error => console.log('Error, Something went wrong:', error));
 
@@ -121,8 +121,8 @@ app.post('/register', async (req, res) => {
             return res.status(400).send("User already registered with this ID number, Sign In!");
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hash(req.body.password, salt);
+        const salt = await bcryptjs.genSalt(10);
+        const hashPassword = await bcryptjs.hash(req.body.password, salt);
 
         const payload = { ...req.body, password: hashPassword };
         delete payload.confirmPassword
@@ -155,7 +155,7 @@ app.post('/login', async (req, res) => {
             return res.status(404).send("User is not found");
         }
 
-        const passwordCheck = await bcrypt.compare(req.body.password, existingPerson.password);
+        const passwordCheck = await bcryptjs.compare(req.body.password, existingPerson.password);
         if (!passwordCheck) {
             return res.status(401).send('Password is Incorrect');
         }
