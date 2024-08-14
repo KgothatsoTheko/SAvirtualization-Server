@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    nodeApiUrl: 'http://live-environment:0217'
+    nodeApiUrl: 'https://savirtualization-app.azurewebsites.net'
 }

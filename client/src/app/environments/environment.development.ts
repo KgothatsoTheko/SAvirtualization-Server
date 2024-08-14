@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    nodeApiUrl: 'http://localhost:0217'
+    nodeApiUrl: 'https://savirtualization-app.azurewebsites.net'
 }
