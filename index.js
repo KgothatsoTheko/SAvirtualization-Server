@@ -38,7 +38,7 @@ mongoose.connection.on('connected', async () => {
     }
 });
 
-app.use(cors({origin: 'http://localhost:4200', // Replace with your Angular app's URL
+app.use(cors({origin: 'https://savirtualization-app.azurewebsites.net', // Replace with your Angular app's URL
     credentials: true}));
 app.use(express.json());
 app.use(cookieParser())
