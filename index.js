@@ -38,7 +38,7 @@ mongoose.connection.on('connected', async () => {
     }
 });
 
-app.use(cors({origin: 'https://savirtualization-app.azurewebsites.net', // Replace with your Angular app's URL
+app.use(cors({origin: 'https://ambitious-hill-0bf9efe03.5.azurestaticapps.net', // Replace with your Angular app's URL
     credentials: true}));
 app.use(express.json());
 app.use(cookieParser())
@@ -409,11 +409,6 @@ app.post('/generate-barcode2', (req, res)=> {
     });
 })
 
-// Production script
-app.use(express.static("./client/build"))
-app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"))
-})
 
 const PORT = process.env.SERVER_PORT || 2522;
 app.listen(PORT, () => {
