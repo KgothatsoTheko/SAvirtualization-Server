@@ -276,13 +276,13 @@ app.post('/token', async (req, res) => {
             id: decoded.id,
         }, process.env.JWT_SECRET, { expiresIn: "10m" });
 
-        const cookieOptions = { httpOnly: true, sameSite: "None", secure: true, };
-        if (process.env.NODE_ENV === 'production') {
-            cookieOptions.secure = true;
-        }
-        res.cookie("access_token", newAccessToken, cookieOptions);
+        // const cookieOptions = { httpOnly: true, sameSite: "None", secure: true, };
+        // if (process.env.NODE_ENV === 'production') {
+        //     cookieOptions.secure = true;
+        // }
+        // res.cookie("access_token", newAccessToken, cookieOptions);
 
-        // res.cookie("access_token", newAccessToken, { httpOnly: true, secure: true, sameSite: "Strict" });
+        res.cookie("access_token", newAccessToken, { httpOnly: true, secure: true, sameSite: "None" });
 
         res.status(200).json({ accessToken: newAccessToken });
     } catch (error) {
