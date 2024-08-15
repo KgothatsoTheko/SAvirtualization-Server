@@ -276,7 +276,13 @@ app.post('/token', async (req, res) => {
             id: decoded.id,
         }, process.env.JWT_SECRET, { expiresIn: "10m" });
 
-        res.cookie("access_token", newAccessToken, { httpOnly: true, secure: true, sameSite: "Strict" });
+        const cookieOptions = { httpOnly: true, sameSite: "Strict" };
+        if (process.env.NODE_ENV === 'production') {
+            cookieOptions.secure = true;
+        }
+        res.cookie("access_token", newAccessToken, cookieOptions);
+
+        // res.cookie("access_token", newAccessToken, { httpOnly: true, secure: true, sameSite: "Strict" });
 
         res.status(200).json({ accessToken: newAccessToken });
     } catch (error) {
