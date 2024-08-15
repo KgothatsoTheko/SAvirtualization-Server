@@ -179,8 +179,8 @@ app.post('/login', async (req, res) => {
 
         await newRefreshToken.save();
 
-        res.cookie("access_token", accessToken, { httpOnly: true, secure: true, sameSite: "Strict" });
-        res.cookie("refresh_token", refreshToken, { httpOnly: true, secure: true, sameSite: "Strict" });
+        res.cookie("access_token", accessToken, { httpOnly: true, secure: true, sameSite: "None" });
+        res.cookie("refresh_token", refreshToken, { httpOnly: true, secure: true, sameSite: "None" });
 
         res.status(200).json({
             status: 200,
