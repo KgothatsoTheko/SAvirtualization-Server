@@ -276,7 +276,7 @@ app.post('/token', async (req, res) => {
             id: decoded.id,
         }, process.env.JWT_SECRET, { expiresIn: "10m" });
 
-        const cookieOptions = { httpOnly: true, sameSite: "Strict" };
+        const cookieOptions = { httpOnly: true, sameSite: "None", secure: true, };
         if (process.env.NODE_ENV === 'production') {
             cookieOptions.secure = true;
         }
