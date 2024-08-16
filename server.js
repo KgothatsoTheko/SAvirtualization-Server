@@ -89,13 +89,13 @@ const RefreshTokenModel = mongoose.model("RefreshToken", RefreshToken);
 
 // authentication of token middleware
 const authenticateToken = (req, res, next) => {
-    const token = req.headers['authorization'];
+    const token = req.cookies.access_token;
 
     if (!token) {
         return res.status(401).send("Access Token required");
     }
 
-    jwt.verify(token.split(' ')[1], process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) {
             if (err.name === 'TokenExpiredError') {
                 return res.status(401).send("Access Token expired");
@@ -107,7 +107,6 @@ const authenticateToken = (req, res, next) => {
         next();
     });
 };
-
 
 // Endpoints
 app.get('/', (req, res) => {
@@ -175,17 +174,18 @@ app.post('/login', async (req, res) => {
             token: refreshToken,
             userId: existingPerson._id,
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+            // expiresAt: new Date(Date.now() + 7 * 60 * 1000) // 7 minutes
         });
 
         await newRefreshToken.save();
 
-        // Send tokens in the response body
+        res.cookie("access_token", accessToken, { httpOnly: true, secure: true, sameSite: "None" });
+        res.cookie("refresh_token", refreshToken, { httpOnly: true, secure: true, sameSite: "None" });
+
         res.status(200).json({
             status: 200,
             message: "Login Success",
-            data: existingPerson,
-            accessToken: accessToken,
-            refreshToken: refreshToken
+            data: existingPerson
         });
 
     } catch (error) {
@@ -193,7 +193,6 @@ app.post('/login', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
-
 // Update the User information
 app.post('/update-user/:idNumber', async(req, res) => {
     try {
@@ -259,15 +258,15 @@ app.get('/get-image/:idNumber', async (req, res) => {
 });
 // Get access token
 app.post('/token', async (req, res) => {
-    const refreshToken = req.headers['authorization'];
+    const refreshToken = req.cookies.refresh_token;
 
     if (!refreshToken) {
         return res.status(401).send("Refresh Token not provided");
     }
 
     try {
-        const decoded = jwt.verify(refreshToken.split(' ')[1], process.env.JWT_REFRESH_SECRET);
-        const existingToken = await RefreshTokenModel.findOne({ token: refreshToken.split(' ')[1], userId: decoded.id });
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        const existingToken = await RefreshTokenModel.findOne({ token: refreshToken, userId: decoded.id });
 
         if (!existingToken) {
             return res.status(401).send("Invalid Refresh Token");
@@ -276,6 +275,14 @@ app.post('/token', async (req, res) => {
         const newAccessToken = jwt.sign({
             id: decoded.id,
         }, process.env.JWT_SECRET, { expiresIn: "10m" });
+
+        // const cookieOptions = { httpOnly: true, sameSite: "None", secure: true, };
+        // if (process.env.NODE_ENV === 'production') {
+        //     cookieOptions.secure = true;
+        // }
+        // res.cookie("access_token", newAccessToken, cookieOptions);
+
+        res.cookie("access_token", newAccessToken, { httpOnly: true, secure: true, sameSite: "None" });
 
         res.status(200).json({ accessToken: newAccessToken });
     } catch (error) {
